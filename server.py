@@ -137,8 +137,17 @@ def send_target_commands(conn):
             cmd = input()
             if len(str.encode(cmd)) > 0:
                 conn.send(str.encode(cmd))
-                client_response = str(conn.recv(20480),"utf-8")
-                print(client_response, end="")
+                full_response = ""
+                while True:
+                    chunk = conn.recv(4096)
+                    if not chunk:
+                        break
+                    chunk_decoded = chunk.decode("utf-8")
+                    full_response += chunk_decoded
+                    if len(chunk) < 4096:
+                        break
+                
+                print(full_response, end="")
             if cmd == 'quit':
                 break
         # except:
